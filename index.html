@@ -1,132 +1,402 @@
-<!DOCTYPE html>  
-<html lang="id">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>UUID Generator-Malvines</title>  
-<style>  
-  body {  
-    font-family: Arial, sans-serif;  
-    margin: 0;  
-    padding: 0;  
-    background: #F8F8F8;  
-    color: #333;  
-    display: flex;  
-    flex-direction: column;  
-    align-items: center;  
-  }  
-  
-  header {  
-    width: 100%;  
-    background: #1F3A93;  
-    color: white;  
-    padding: 20px 0;  
-    text-align: center;  
-  }  
-  
-  main {  
-    padding: 30px 20px;  
-    max-width: 600px;  
-    text-align: center;  
-  }  
-  
-  .modern-btn {
-    background: transparent;
-    color: #1F3A93;
-    border: 2px solid #1F3A93;
-    padding: 10px 20px;
-    margin: 10px 5px 0 5px;
-    cursor: pointer;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: all 0.2s ease;
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UUID Generator - Malvines</title>
 
-  .modern-btn:hover {
-    background: #1F3A93;
-    color: white;
-    transform: scale(1.05);
-  }
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #F8F8F8;
+  overflow-x: hidden;
+}
 
-  .modern-btn:active {
-    transform: scale(0.95);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  }
-  
-  .uuid-display {  
-    margin-top: 20px;  
-    font-weight: bold;  
-    word-break: break-all;  
-    color: #1F3A93;  
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+/* TOP BLACK BAR */
+.topbar {
+  height: 40px;
+  background: #111;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
 
-  .uuid-text {
-    flex: 1;
-    margin-right: 10px;
-    word-break: break-all;
-  }
+.menu-btn {
+  width: 36px;
+  height: 28px;
+  border: 1px solid #1F3A93;
+  color: #1F3A93;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+}
 
-  .copy-error {
-    color: red;
-    margin-top: 10px;
-    font-size: 14px;
-    display: none;
-  }
-  
-  footer {  
-    margin-top: 20px;  
-    padding: 10px;  
-    font-size: 12px;  
-    color: #777;  
-  }  
-</style>  
-</head>  
-<body>  
-<header>  
-  <h1>UUID Generator-Malvines</h1>  
-  <p>Generate UUID v4 Quickly</p>  
-</header>  
-  
-<main>  
-  <button class="modern-btn" onclick="generateUUID()">Generate UUID</button>  
-  <div class="uuid-display">
-    <span class="uuid-text" id="uuidDisplay">Klik tombol untuk generate UUID</span>
-    <button class="modern-btn" onclick="copyUUID()">Copy</button>
+/* BLUE HEADER */
+header {
+  background: #1F3A93;
+  color: white;
+  padding: 18px 10px;
+  text-align: center;
+}
+
+/* SIDE MENU */
+.side-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 80%;
+  height: 100%;
+  background: #fff;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+  z-index: 10;
+  padding: 15px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+}
+
+.side-menu.open {
+  transform: translateX(0);
+}
+
+.close-btn {
+  border: none;
+  background: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #1F3A93;
+}
+
+/* OVERLAY */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 5;
+}
+
+.overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* APP SHIFT */
+.app {
+  transition: transform 0.25s ease;
+}
+
+.app.shift {
+  transform: translateX(80%);
+}
+
+/* MAIN */
+main {
+  padding: 25px 15px;
+  max-width: 600px;
+  margin: auto;
+}
+
+/* BUTTON */
+.modern-btn {
+  background: transparent;
+  color: #1F3A93;
+  border: 1px solid #1F3A93;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.modern-btn:hover {
+  background: #1F3A93;
+  color: white;
+}
+
+/* UUID Selector Buttons */
+.selector-btn {
+  background: transparent;
+  color: #1F3A93;
+  border: 1px solid #1F3A93;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-right: 6px;
+  transition: 0.2s;
+}
+
+.selector-btn.active {
+  background: #1F3A93;
+  color: white;
+}
+
+/* GENERATOR CONTAINER */
+.generator-box {
+  margin-top: 15px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #1F3A93;
+  background: #fff;
+}
+
+.uuid-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.uuid-text {
+  word-break: break-all;
+  margin-right: 10px;
+}
+
+.copy-error {
+  color: red;
+  margin-top: 6px;
+  font-size: 14px;
+  display: none;
+}
+
+/* HISTORY */
+.history-box {
+  margin: 14px auto 4px;
+  width: 92%;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: 
+    max-height 0.3s ease,
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.history-box.open {
+  max-height: 320px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.history-item {
+  border: 1px solid #1F3A93;
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin-top: 6px;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  background: #fff;
+}
+
+.history-label {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(31,58,147,0.4);
+  margin-bottom: 10px;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  font-size: 12px;
+  color: #777;
+  padding: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDE MENU -->
+<div class="side-menu" id="sideMenu">
+  <button class="close-btn" onclick="toggleMenu()">←</button>
+  <h3>Menu</h3>
+
+  <p><b>UUID Version</b></p>
+  <button class="selector-btn" id="v4Btn" onclick="setVersion('v4')">UUID v4</button>
+  <button class="selector-btn" id="v1Btn" onclick="setVersion('v1')">UUID v1</button>
+
+  <p><b>Export History</b></p>
+  <button class="modern-btn" onclick="exportHistory()">Export UUIDs</button>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<div class="app" id="app">
+
+  <div class="topbar">
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
   </div>
-  <div class="copy-error" id="copyError">Gagal menyalin, coba lagi.</div>
-</main>  
 
-<footer>  
-  &copy; 2025 Malvines  
-</footer>  
-  
-<script>  
+  <header>
+    <h2>UUID Generator</h2>
+    <p>Simple & Clean</p>
+  </header>
+
+  <main onclick="closeMenuFromMain()">
+
+    <div class="generator-box">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="modern-btn" id="generateBtn" onclick="generateUUID()">Generate UUID</button>
+        <span id="cooldownText" style="font-size: 13px; color: #555;"></span>
+      </div>
+
+      <div class="uuid-display">
+        <span class="uuid-text" id="uuidDisplay">Click generate</span>
+        <button class="modern-btn" onclick="copyUUID()">Copy</button>
+      </div>
+      <div class="copy-error" id="copyError">Failed to copy, try again.</div>
+    </div>
+
+    <div class="history-box" id="historyBox"></div>
+    <div class="history-label">UUIDs history</div>
+
+    <button class="modern-btn" id="historyBtn" onclick="toggleHistory()">Open</button>
+
+  </main>
+
+<footer>
+  &copy; 2025 Malvines<br>
+  <small style="color:#555; line-height: 1.4;">
+    UUIDs generated by this site are provided AS IS, without any warranty of uniqueness or suitability.<br>
+    Users are responsible for their usage. We are not responsible for illegal or harmful use of UUIDs.<br>
+    <a href="terms.html" style="color:#1F3A93; text-decoration: underline;">Terms of Use</a>
+  </small>
+</footer>
+</div>
+
+<script>
+let menuOpen = false;
+let historyOpen = false;
+let history = [];
+let uuidVersion = 'v4';
+
+// TAB VISIBILITY → DISABLE GENERATE
+document.addEventListener('visibilitychange', () => {
+  const btn = document.getElementById('generateBtn');
+  if (document.hidden) {
+    btn.disabled = true;
+    btn.style.opacity = 0.5;
+  } else {
+    btn.disabled = false;
+    btn.style.opacity = 1;
+  }
+});
+
+function toggleMenu() {
+  menuOpen = !menuOpen;
+  document.getElementById('sideMenu').classList.toggle('open', menuOpen);
+  document.getElementById('overlay').classList.toggle('show', menuOpen);
+  document.getElementById('app').classList.toggle('shift', menuOpen);
+}
+
+function closeMenuFromMain() {
+  if(menuOpen) toggleMenu();
+}
+
+// SET UUID VERSION + ACTIVE BUTTON VISUAL
+function setVersion(v) {
+  uuidVersion = v;
+  document.getElementById('v4Btn').classList.toggle('active', v === 'v4');
+  document.getElementById('v1Btn').classList.toggle('active', v === 'v1');
+}
+
 function generateUUID() {
-  const uuid = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-  );
+  const btn = document.getElementById('generateBtn');
+  const cooldownText = document.getElementById('cooldownText');
+  if (btn.disabled) return;
+
+  let uuid;
+  if (uuidVersion === 'v1') {
+    uuid = Date.now().toString(16) + Math.random().toString(16).slice(2,10);
+  } else {
+    uuid = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+      (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+  }
+
   document.getElementById('uuidDisplay').textContent = uuid;
-  document.getElementById('copyError').style.display = 'none'; // reset error kalau ada
+
+  history.unshift(uuid);
+  history = history.slice(0,10);
+  renderHistory();
+
+  // SIMPLE CLICK LIMIT → DISABLE SHORT
+  const cooldown = 400; // ms
+  btn.disabled = true;
+  btn.style.opacity = 0.5;
+
+  let remaining = cooldown;
+  cooldownText.textContent = `You have ${remaining} ms to generate another UUID.`;
+
+  const interval = setInterval(() => {
+    remaining -= 50;
+    if (remaining <= 0) remaining = 0;
+    cooldownText.textContent = `You have ${remaining} ms to generate another UUID.`;
+  }, 50);
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.style.opacity = 1;
+    cooldownText.textContent = '';
+    clearInterval(interval);
+  }, cooldown);
+}
+
+function renderHistory() {
+  const box = document.getElementById('historyBox');
+  box.innerHTML = '';
+  history.forEach(u => {
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    div.innerHTML = `<span>${u}</span><button class="modern-btn" onclick="navigator.clipboard.writeText('${u}')">Copy</button>`;
+    box.appendChild(div);
+  });
+}
+
+function toggleHistory() {
+  historyOpen = !historyOpen;
+  const box = document.getElementById('historyBox');
+  const btn = document.getElementById('historyBtn');
+
+  box.classList.toggle('open', historyOpen);
+  btn.textContent = historyOpen ? 'Close' : 'Open';
 }
 
 function copyUUID() {
-  const uuidText = document.getElementById('uuidDisplay').textContent;
-  navigator.clipboard.writeText(uuidText).catch(() => {
-    const errorDiv = document.getElementById('copyError');
-    errorDiv.style.display = 'block';
-    setTimeout(() => {
-      errorDiv.style.display = 'none';
-    }, 3000);
-  });
+  navigator.clipboard.writeText(document.getElementById('uuidDisplay').textContent)
+    .then(() => {
+      const txt = document.getElementById('uuidDisplay');
+      txt.style.color = "#1F3A93";
+      setTimeout(() => txt.style.color = "", 300);
+    })
+    .catch(() => {
+      const errorDiv = document.getElementById('copyError');
+      errorDiv.style.display = 'block';
+      setTimeout(() => { errorDiv.style.display = 'none'; }, 3000);
+    });
 }
-</script>  
-</body>  
-  </html>
+
+// EXPORT HISTORY
+function exportHistory() {
+  if (history.length === 0) {
+    alert("No UUIDs to export.");
+    return;
+  }
+  const blob = new Blob([history.join("\n")], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'uuid_history.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+          </html>
